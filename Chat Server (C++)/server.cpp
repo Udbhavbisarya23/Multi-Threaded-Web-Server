@@ -56,7 +56,7 @@ void* handleUser(void* arg)
 	int connfd = *((int*) arg);
 
 	//USER AUTHENTICATION
-	char username[MESSAGE_SIZE], password[MESSAGE_SIZE], status = 0;
+	char username[MESSAGE_SIZE], password[MESSAGE_SIZE], status = 0;  
 	int loggedIn = 3;
 	while (loggedIn--)
 	{
@@ -90,8 +90,8 @@ void* handleUser(void* arg)
 	}
 
 	//GET RECIPIENT NAME AND OPEN RESPECTIVE FILES
-	ifstream push;
-	ofstream pull;
+	ifstream push;// input file stream
+	ofstream pull;// output file stream
 	char recipient[MESSAGE_SIZE];
 	status = 0;
 	while (!status)
@@ -165,20 +165,28 @@ int main()
 	cin >> SERV_PORT;
 
 	///CREATING A SOCKET
-	int listenfd = socket(AF_INET, SOCK_STREAM, 0);
+	int listenfd = socket(AF_INET, SOCK_STREAM, 0);//AF_INET - IPv4 protocol, SOCK_STREAM - TCP connection, 0(for IP) - protocol
 
 	//BINDING THE SOCKET
+	
+	//struct sockaddr_in {
+	// sa_family_t sin_family;    /* Address Family */ - AF_INET - IPv4
+	// uint16_t sin_port;         /* Port number */
+	// struct in_addr sin_addr;   /* Internet address */
+	// unsigned char sin_zero[8]; /* Pad bytes */
+		
+		
 	sockaddr_in servaddr;
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_port = htons(SERV_PORT);
-	if (bind(listenfd, (sockaddr*) &servaddr, sizeof(servaddr)) == -1)
+	servaddr.sin_port = htons(SERV_PORT);//htons - takes IP port number - converts 16 but IP address converts from network byte order to host order
+	if (bind(listenfd, (sockaddr*) &servaddr, sizeof(servaddr)) == -1)// used to bind IP address and port of the host to the socket
 	{
 		cout << "Error During Binding" << endl;
 		exit(1);
 	}
 
-	pthread_t threadId;
+	pthread_t threadId;// pthread_t - data type of thread
 	int* arg;
 	while (1)
 	{
@@ -199,6 +207,7 @@ int main()
 
 		arg = new int;
 		*arg = connfd;
-		pthread_create(&threadId, NULL, handleUser, arg);
+		pthread_create(&threadId, NULL, handleUser, arg);// Creates another thread, NULL - signifies Null attributes, handleUser - function to be called whne each thread
+								 // is created, 
 	}
 }
